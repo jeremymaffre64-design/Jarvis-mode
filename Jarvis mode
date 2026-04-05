@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS Chronos</title>
+    <style>
+        /* CSS : Design J.A.R.V.I.S. Neon Blue */
+        body {
+            background-color: transparent; /* Fond transparent pour Notion */
+            color: #00FFFF; /* Bleu Électrique */
+            font-family: 'Courier New', monospace; /* Police code */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 150px; /* Taille compacte */
+            height: 150px;
+        }
+
+        /* La forme circulaire */
+        .circle-svg {
+            transform: rotate(-90deg); /* Démarrer en haut */
+            width: 100%;
+            height: 100%;
+        }
+
+        .circle-background {
+            fill: none;
+            stroke: #004444; /* Bleu très sombre pour la piste */
+            stroke-width: 8;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: #00FFFF; /* Bleu vif pour la progression */
+            stroke-width: 8;
+            stroke-linecap: round; /* Bords arrondis */
+            stroke-dasharray: 440; /* Périmètre de 2*PI*R (R=70) */
+            stroke-dashoffset: 440; /* Tout masqué au départ */
+            transition: stroke-dashoffset 1s linear; /* Animation fluide */
+            filter: drop-shadow(0 0 5px #00FFFF); /* Effet Glow Néon */
+        }
+
+        /* L'affichage du temps */
+        .time-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00FFFF;
+        }
+
+        /* Boutons (cachés par défaut pour un look minimaliste, peuvent être affichés) */
+        .controls {
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="circle-svg" viewBox="0 0 160 160">
+            <circle class="circle-background" cx="80" cy="80" r="70"/>
+            <circle class="circle-progress" cx="80" cy="80" r="70"/>
+        </svg>
+        <div class="time-display" id="time">25:00</div>
+    </div>
+
+    <script>
+        // JS : Logique du Chronomètre
+        const timeDisplay = document.getElementById('time');
+        const progressCircle = document.querySelector('.circle-progress');
+        
+        let totalTime = 25 * 60; // 25 minutes par défaut (Pomodoro)
+        let currentTime = totalTime;
+        let timerId;
+        const perimeter = 440; // Correspond à stroke-dasharray
+
+        function updateDisplay() {
+            let minutes = Math.floor(currentTime / 60);
+            let seconds = currentTime % 60;
+            timeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            // Calculer l'offset pour la progression circulaire
+            const offset = perimeter - (perimeter * currentTime) / totalTime;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                currentTime--;
+                updateDisplay();
+
+                if (currentTime <= 0) {
+                    clearInterval(timerId);
+                    timeDisplay.textContent = "DONE";
+                    progressCircle.style.strokeDashoffset = 0;
+                    // Optionnel : Ajouter un son d'alerte Stark ici
+                }
+            }, 1000);
+        }
+
+        // Démarrage automatique pour la démo Notion
+        updateDisplay();
+        startTimer();
+
+    </script>
+</body>
+</html>
